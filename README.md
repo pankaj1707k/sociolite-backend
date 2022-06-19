@@ -13,8 +13,8 @@ _Make sure you have python 3.8 or higher installed and added to system path_
 - Create a `.env` file with following content:
 
 ```
-|  SECRET_KEY=<random-django-secret-key>
-|  DEBUG=True
+SECRET_KEY=<random-django-secret-key>
+DEBUG=True
 ```
 
 - Apply migrations: `$ python manage.py migrate`
