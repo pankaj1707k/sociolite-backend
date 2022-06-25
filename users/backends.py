@@ -18,6 +18,6 @@ class AuthBackend(ModelBackend):
         except UserModel.DoesNotExist:
             # Derived from super().authenticate()
             UserModel().set_password(password)
-
-        if user.check_password(password) and self.user_can_authenticate(user):
-            return user
+        else:
+            if user.check_password(password) and self.user_can_authenticate(user):
+                return user
