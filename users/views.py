@@ -4,7 +4,6 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.status import *
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.serializers import LoginSerializer, UserSerializer
 from users.utils import get_token_pair
@@ -24,9 +23,7 @@ class UserCreateView(CreateAPIView):
         instance = serializer.save()
         headers = self.get_success_headers(serializer.data)
         data = dict(serializer.data)
-        refresh = RefreshToken.for_user(instance)
-        data["refresh"] = str(refresh)
-        data["access"] = str(refresh.access_token)
+        data.update(get_token_pair(instance))
         return Response(data, status=HTTP_201_CREATED, headers=headers)
 
 
@@ -44,10 +41,6 @@ class LoginView(APIView):
         if user is None:
             msg = {"error": "Invalid credentials"}
             return Response(msg, HTTP_401_UNAUTHORIZED)
-        token_pair = get_token_pair(user)
-        response = {
-            "success": "User authenticated",
-            "refresh": token_pair["refresh"],
-            "access": token_pair["access"],
-        }
+        response = {"success": "User authenticated"}
+        response.update(get_token_pair(user))
         return Response(response, HTTP_200_OK)
