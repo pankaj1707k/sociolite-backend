@@ -27,7 +27,7 @@ class Profile(models.Model):
     location = models.CharField(_("location"), max_length=100, blank=True)
     work = models.CharField(_("work"), max_length=200, blank=True)
     about = models.TextField(_("about"), blank=True)
-    date_of_birth = models.DateField(_("date of birth"), blank=True)
+    date_of_birth = models.DateField(_("date of birth"), blank=True, null=True)
     picture = models.ImageField(
         _("picture"), upload_to=get_profile_image_path, default="profile/default.png"
     )
