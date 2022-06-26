@@ -51,6 +51,10 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 
+# Ignore all profile pics uploaded by users except the default profile image
+media/profile/*
+!media/profile/default.png
+
 # Environments
 .env
 .venv

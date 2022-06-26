@@ -145,3 +145,7 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticatedOrReadOnly"
     ],
 }
+
+# Media files (mostly images)
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/media/"
