@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from PIL import Image
 
 from users.utils import get_profile_image_path
 
@@ -34,3 +35,10 @@ class Profile(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user.username}"
+
+    def save(self):
+        super().save()
+        img = Image.open(self.picture.path)
+        if img.height > 512 or img.width > 512:
+            img.thumbnail((512, 512))
+            img.save(self.picture.path)
