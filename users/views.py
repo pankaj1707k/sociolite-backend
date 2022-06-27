@@ -1,9 +1,10 @@
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import authenticate, get_user_model, logout
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.status import *
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.serializers import LoginSerializer, UserSerializer
 from users.utils import get_token_pair
@@ -44,3 +45,17 @@ class LoginView(APIView):
         response = {"success": "User authenticated"}
         response.update(get_token_pair(user))
         return Response(response, HTTP_200_OK)
+
+
+class LogoutView(APIView):
+    """Server side logout for user by blacklisting the auth token"""
+
+    def post(self, request):
+        try:
+            refresh_token = request.data.get("refresh")
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            logout(request)
+            return Response(status=HTTP_205_RESET_CONTENT)
+        except Exception:
+            return Response(status=HTTP_400_BAD_REQUEST)
