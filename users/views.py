@@ -6,7 +6,8 @@ from rest_framework.status import *
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from users.serializers import LoginSerializer, UserSerializer
+from users.models import Profile
+from users.serializers import LoginSerializer, ProfileSerializer, UserSerializer
 from users.utils import get_token_pair
 
 User = get_user_model()
@@ -59,3 +60,22 @@ class LogoutView(APIView):
             return Response(status=HTTP_205_RESET_CONTENT)
         except Exception:
             return Response(status=HTTP_400_BAD_REQUEST)
+
+
+class ProfileView(APIView):
+    """
+    Get and update user profile.
+    Allowed Methods: GET, PATCH
+    """
+
+    def get(self, request):
+        instance = Profile.objects.get(user=request.user)
+        serializer = ProfileSerializer(instance)
+        return Response(serializer.data, HTTP_200_OK)
+
+    def patch(self, request):
+        instance = Profile.objects.get(user=request.user)
+        serializer = ProfileSerializer(instance, request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, HTTP_200_OK)

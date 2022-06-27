@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
+from users.models import Profile
+
 User = get_user_model()
 
 
@@ -30,3 +32,16 @@ class UserSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        exclude = ["id", "user"]
+        extra_kwargs = {
+            "location": {"required": False},
+            "work": {"required": False},
+            "about": {"required": False},
+            "date_of_birth": {"required": False},
+            "picture": {"required": False},
+        }
