@@ -1,5 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
 from rest_framework import serializers
 
 from users.models import Profile
@@ -45,3 +48,31 @@ class ProfileSerializer(serializers.ModelSerializer):
             "date_of_birth": {"required": False},
             "picture": {"required": False},
         }
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    uid = serializers.CharField()
+    token = serializers.CharField()
+    password = serializers.CharField()
+
+    def validate(self, attrs):
+        user = self.context.get("request").user
+        uid = int(force_str(urlsafe_base64_decode(attrs["uid"])))
+
+        if uid != user.id:
+            detail = {"uid": "Invalid uid"}
+            raise serializers.ValidationError(detail, code=401)
+
+        if not PasswordResetTokenGenerator().check_token(user, attrs["token"]):
+            detail = {"token": "Invalid token"}
+            raise serializers.ValidationError(detail, code=401)
+
+        validate_password(attrs["password"])
+        return attrs
+
+    def save(self, **kwargs):
+        password = self.validated_data["password"]
+        user = self.context.get("request").user
+        user.set_password(password)
+        user.save()
+        return user

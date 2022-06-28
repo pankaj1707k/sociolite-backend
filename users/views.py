@@ -1,4 +1,8 @@
 from django.contrib.auth import authenticate, get_user_model, logout
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core.mail import send_mail
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -7,7 +11,12 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.models import Profile
-from users.serializers import LoginSerializer, ProfileSerializer, UserSerializer
+from users.serializers import (
+    LoginSerializer,
+    PasswordResetSerializer,
+    ProfileSerializer,
+    UserSerializer,
+)
 from users.utils import get_token_pair
 
 User = get_user_model()
@@ -79,3 +88,43 @@ class ProfileView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, HTTP_200_OK)
+
+
+class PasswordResetView(APIView):
+    """
+    Request password reset token via email.
+    Allowed methods: POST
+    """
+
+    def post(self, request):
+        from_email = None  # will use built-in default for console backend
+        to_email = request.user.email
+        subject = "Password reset request"
+        uid = urlsafe_base64_encode(force_bytes(request.user.id))
+        token = PasswordResetTokenGenerator().make_token(request.user)
+
+        message = f"""
+            Hello {request.user.name}!
+            To reset your password click on the following link:
+            http://basehost.domain/password-reset/{uid}/{token}/
+        """
+
+        send_mail(subject, message, from_email, [to_email])
+
+        response = {"email": "Instructions to reset password sent to registered email"}
+        return Response(response, HTTP_200_OK)
+
+
+class PasswordResetConfirmView(APIView):
+    """
+    Check uid and token and change the password.
+    Allowed methods: POST
+    """
+
+    def post(self, request):
+        context = {"request": request}
+        serializer = PasswordResetSerializer(data=request.data, context=context)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        msg = {"success": "Password updated"}
+        return Response(msg, HTTP_200_OK)
