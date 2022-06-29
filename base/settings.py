@@ -46,10 +46,12 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
+    "corsheaders",
     "users.apps.UsersConfig",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -161,3 +163,6 @@ SIMPLE_JWT = {
 
 # Email
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+# CORS
+CORS_ALLOWED_ORIGINS = ["http://localhost:8000", "http://localhost:3000"]
