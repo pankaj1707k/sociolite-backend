@@ -60,3 +60,29 @@ class Comment(models.Model):
 
     def __str__(self) -> str:
         return f"id: {self.id}, author: {self.author.username}"
+
+
+class Like(models.Model):
+    """
+    Model representing a like/reaction on a post.
+    It does not have any content. It is related to a post and a user.
+    """
+
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="likes", related_query_name="like"
+    )
+    post = models.ForeignKey(
+        Post, on_delete=models.CASCADE, related_name="likes", related_query_name="like"
+    )
+    created_on = models.DateTimeField(_("created on"), auto_now_add=True)
+
+    class Meta:
+        verbose_name = "like"
+        verbose_name_plural = "likes"
+        ordering = ["-created_on"]
+        constraints = [
+            models.UniqueConstraint(fields=("author", "post"), name="like_author_post")
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.id}__{self.author.username}__{self.post.id}"
