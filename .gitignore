@@ -55,6 +55,9 @@ db.sqlite3-journal
 media/profile/*
 !media/profile/default.png
 
+# Post images
+media/post/*
+
 # Environments
 .env
 .venv
