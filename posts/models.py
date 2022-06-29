@@ -27,7 +27,7 @@ class Post(models.Model):
         ordering = ["-updated_on"]
 
     def __str__(self) -> str:
-        return f"id: {self.id}, author: {self.author.username}"
+        return f"{self.id}__{self.author.username}"
 
 
 class Comment(models.Model):
@@ -59,7 +59,7 @@ class Comment(models.Model):
         ordering = ["-created_on"]
 
     def __str__(self) -> str:
-        return f"id: {self.id}, author: {self.author.username}"
+        return f"{self.id}__{self.author.username}__{self.post.id}"
 
 
 class Like(models.Model):
