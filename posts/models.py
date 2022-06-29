@@ -28,3 +28,35 @@ class Post(models.Model):
 
     def __str__(self) -> str:
         return f"id: {self.id}, author: {self.author.username}"
+
+
+class Comment(models.Model):
+    """
+    Model representing a comment on a post.
+    A comment contains only text content and
+    is related to a post and a user
+    """
+
+    text = models.TextField(_("text"))
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="comments",
+        related_query_name="comment",
+    )
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name="comments",
+        related_query_name="comment",
+    )
+    created_on = models.DateTimeField(_("created on"), auto_now_add=True)
+    updated_on = models.DateTimeField(_("updated on"), auto_now=True)
+
+    class Meta:
+        verbose_name = "comment"
+        verbose_name_plural = "comments"
+        ordering = ["-created_on"]
+
+    def __str__(self) -> str:
+        return f"id: {self.id}, author: {self.author.username}"
