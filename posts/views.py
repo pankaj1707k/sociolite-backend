@@ -22,3 +22,49 @@ class PostListCreateView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, HTTP_201_CREATED)
+
+
+class PostReadUpdateDeleteView(APIView):
+    """
+    Retrieve, update and delete an individual post.
+    Allowed methods: GET, PATCH, DELETE
+    """
+
+    def get(self, request, **kwargs):
+        post_id = self.kwargs.get("pk")
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            error = {"not found": "post with the provided id does not exist"}
+            return Response(error, HTTP_404_NOT_FOUND)
+        serializer = PostSerializer(post)
+        return Response(serializer.data, HTTP_200_OK)
+
+    def patch(self, request, **kwargs):
+        post_id = self.kwargs.get("pk")
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            error = {"not found": "post with the provided id does not exist"}
+            return Response(error, HTTP_404_NOT_FOUND)
+        if post.author != request.user:
+            error = {"access denied": "post is not authored by requesting user"}
+            return Response(error, HTTP_401_UNAUTHORIZED)
+        serializer = PostSerializer(post, request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, HTTP_200_OK)
+
+    def delete(self, request, **kwargs):
+        post_id = self.kwargs.get("pk")
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            error = {"not found": "post with the provided id does not exist"}
+            return Response(error, HTTP_404_NOT_FOUND)
+        if post.author != request.user:
+            error = {"access denied": "post is not authored by requesting user"}
+            return Response(error, HTTP_401_UNAUTHORIZED)
+        post.delete()
+        success_message = {"success": "post deleted"}
+        return Response(success_message, HTTP_204_NO_CONTENT)
