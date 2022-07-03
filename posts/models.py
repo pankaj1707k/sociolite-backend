@@ -14,7 +14,9 @@ class Post(models.Model):
     """
 
     text = models.TextField(_("text"), blank=True)
-    image = models.ImageField(_("image"), null=True, upload_to=get_post_image_path)
+    image = models.ImageField(
+        _("image"), blank=True, null=True, upload_to=get_post_image_path
+    )
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="posts", related_query_name="post"
     )
