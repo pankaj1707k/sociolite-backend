@@ -2,8 +2,8 @@ from rest_framework.response import Response
 from rest_framework.status import *
 from rest_framework.views import APIView
 
-from posts.models import Post
-from posts.serializers import PostSerializer
+from posts.models import Comment, Post
+from posts.serializers import CommentSerializer, PostSerializer
 
 
 class PostListCreateView(APIView):
@@ -68,3 +68,27 @@ class PostReadUpdateDeleteView(APIView):
         post.delete()
         success_message = {"success": "post deleted"}
         return Response(success_message, HTTP_204_NO_CONTENT)
+
+
+class CommentListCreateView(APIView):
+    """
+    List and create comment for given post.
+    Allowed methods: GET, POST
+    """
+
+    def get(self, request, **kwargs):
+        queryset = Comment.objects.filter(post__id=kwargs["pid"])
+        serializer = CommentSerializer(queryset, many=True)
+        return Response(serializer.data, HTTP_200_OK)
+
+    def post(self, request, **kwargs):
+        try:
+            post = Post.objects.get(pk=kwargs["pid"])
+        except Post.DoesNotExist:
+            error = {"not found": "post with the provided id does not exist"}
+            return Response(error, HTTP_404_NOT_FOUND)
+        serializer_context = {"request": request, "post": post}
+        serializer = CommentSerializer(data=request.data, context=serializer_context)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, HTTP_201_CREATED)
