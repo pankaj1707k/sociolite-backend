@@ -4,6 +4,7 @@ from posts.views import (
     CommentListCreateView,
     CommentReadUpdateDeleteView,
     LikeListCreateView,
+    LikeReadDeleteView,
     PostListCreateView,
     PostReadUpdateDeleteView,
 )
@@ -14,4 +15,5 @@ urlpatterns = [
     path("<int:pid>/comment/", CommentListCreateView.as_view()),
     path("<int:pid>/comment/<int:cid>/", CommentReadUpdateDeleteView.as_view()),
     path("<int:pid>/like/", LikeListCreateView.as_view()),
+    path("<int:pid>/like/<int:lid>/", LikeReadDeleteView.as_view()),
 ]

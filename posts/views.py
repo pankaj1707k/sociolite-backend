@@ -168,3 +168,38 @@ class LikeListCreateView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, HTTP_201_CREATED)
+
+
+class LikeReadDeleteView(APIView):
+    """
+    Retrieve and delete an individual like instance.
+    Allowed methods: GET, DELETE
+    """
+
+    def get(self, request, **kwargs):
+        if not Post.objects.filter(pk=kwargs["pid"]).exists():
+            error = {"not found": "post with the provided id does not exist"}
+            return Response(error, HTTP_404_NOT_FOUND)
+        try:
+            like = Like.objects.get(pk=kwargs["lid"])
+        except Like.DoesNotExist:
+            error = {"not found": "like with the provided id does not exist"}
+            return Response(error, HTTP_404_NOT_FOUND)
+        serializer = LikeSerializer(like)
+        return Response(serializer.data, HTTP_200_OK)
+
+    def delete(self, request, **kwargs):
+        if not Post.objects.filter(pk=kwargs["pid"]).exists():
+            error = {"not found": "post with the provided id does not exist"}
+            return Response(error, HTTP_404_NOT_FOUND)
+        try:
+            like = Like.objects.get(pk=kwargs["lid"])
+        except Like.DoesNotExist:
+            error = {"not found": "like with the provided id does not exist"}
+            return Response(error, HTTP_404_NOT_FOUND)
+        if like.author != request.user:
+            error = {"access denied": "like is not authored by requesting user"}
+            return Response(error, HTTP_401_UNAUTHORIZED)
+        like.delete()
+        success_message = {"success": "like deleted"}
+        return Response(success_message, HTTP_204_NO_CONTENT)
