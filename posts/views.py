@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.status import *
 from rest_framework.views import APIView
+from users.models import FollowRelation
 
 from posts.models import Comment, Like, Post
 from posts.serializers import CommentSerializer, LikeSerializer, PostSerializer
@@ -13,7 +14,11 @@ class PostListCreateView(APIView):
     """
 
     def get(self, request):
-        queryset = Post.objects.all()
+        users = FollowRelation.objects.filter(from_user=request.user)
+        users = [obj.to_user for obj in users]
+        queryset = Post.objects.filter(author__in=users)
+        if not queryset.exists():
+            queryset = Post.objects.all()
         serializer = PostSerializer(queryset, many=True)
         return Response(serializer.data, HTTP_200_OK)
 
