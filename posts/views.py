@@ -208,3 +208,15 @@ class LikeReadDeleteView(APIView):
         like.delete()
         success_message = {"success": "like deleted"}
         return Response(success_message, HTTP_204_NO_CONTENT)
+
+
+class PostListByUserView(APIView):
+    """
+    List all posts authored by a user.
+    Allowed methods: GET
+    """
+
+    def get(self, request, **kwargs):
+        queryset = Post.objects.filter(author__id=kwargs["uid"])
+        serializer = PostSerializer(queryset, many=True)
+        return Response(serializer.data, HTTP_200_OK)
