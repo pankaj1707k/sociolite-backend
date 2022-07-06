@@ -10,7 +10,7 @@ from rest_framework.status import *
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from users.models import Profile
+from users.models import FollowRelation, Profile
 from users.serializers import (
     LoginSerializer,
     PasswordResetSerializer,
@@ -143,3 +143,21 @@ class FollowUserView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, HTTP_201_CREATED)
+
+
+class UnfollowUserView(APIView):
+    """
+    Unfollow a user.
+    Allowed methods: POST
+    """
+
+    def post(self, request):
+        try:
+            obj = FollowRelation.objects.get(
+                from_user=request.user, to_user=request.data["to_user"]
+            )
+        except FollowRelation.DoesNotExist:
+            error = {"error": "user not followed"}
+            return Response(error, HTTP_400_BAD_REQUEST)
+        obj.delete()
+        return Response(status=HTTP_204_NO_CONTENT)
