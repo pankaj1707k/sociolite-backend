@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
 from users.forms import UserCreationForm
-from users.models import Profile
+from users.models import FollowRelation, Profile
 
 User = get_user_model()
 
@@ -45,3 +45,4 @@ class UserAdmin(auth_admin.UserAdmin):
 
 
 admin.site.register(Profile)
+admin.site.register(FollowRelation)
