@@ -15,6 +15,7 @@ from users.serializers import (
     LoginSerializer,
     PasswordResetSerializer,
     ProfileSerializer,
+    UserFollowSerializer,
     UserSerializer,
 )
 from users.utils import get_token_pair
@@ -128,3 +129,17 @@ class PasswordResetConfirmView(APIView):
         serializer.save()
         msg = {"success": "Password updated"}
         return Response(msg, HTTP_200_OK)
+
+
+class FollowUserView(APIView):
+    """
+    Follow a user.
+    Allowed methods: POST
+    """
+
+    def post(self, request):
+        context = {"request": request}
+        serializer = UserFollowSerializer(data=request.data, context=context)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, HTTP_201_CREATED)

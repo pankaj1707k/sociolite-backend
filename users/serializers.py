@@ -5,7 +5,7 @@ from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from rest_framework import serializers
 
-from users.models import Profile
+from users.models import FollowRelation, Profile
 
 User = get_user_model()
 
@@ -76,3 +76,14 @@ class PasswordResetSerializer(serializers.Serializer):
         user.set_password(password)
         user.save()
         return user
+
+
+class UserFollowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FollowRelation
+        fields = "__all__"
+        read_only_fields = ["from_user"]
+
+    def create(self, validated_data):
+        validated_data["from_user"] = self.context["request"].user
+        return super().create(validated_data)
