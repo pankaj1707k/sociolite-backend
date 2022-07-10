@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, logout
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.mail import send_mail
@@ -98,7 +99,7 @@ class PasswordResetView(APIView):
     """
 
     def post(self, request):
-        from_email = None  # will use built-in default for console backend
+        from_email = settings.EMAIL_HOST_USER
         to_email = request.user.email
         subject = "Password reset request"
         uid = urlsafe_base64_encode(force_bytes(request.user.id))
