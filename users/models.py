@@ -36,8 +36,8 @@ class Profile(models.Model):
     def __str__(self) -> str:
         return f"{self.user.username}"
 
-    def save(self):
-        super().save()
+    def save(self, **kwargs):
+        super().save(**kwargs)
         img = Image.open(self.picture.path)
         if img.height > 512 or img.width > 512:
             img.thumbnail((512, 512))
