@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 
-import django_on_heroku
 import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -176,8 +175,4 @@ EMAIL_HOST_PASSWORD = env("PASSWORD")
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "http://localhost:3000",
-    "https://socioliteapi.herokuapp.com",
 ]
-
-# django-on-heroku config
-django_on_heroku.settings(locals())
